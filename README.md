@@ -21,7 +21,7 @@ No installation, account, server or external dependencies are required.
 
 ## Development
 
-Built iteratively with assistance from OpenAI's ChatGPT. Concept, creative direction, content selection and testing were guided by the project creator.
+Built iteratively with assistance from OpenAI's ChatGPT based on an original Tracery grammar. Concept, creative direction, content selection and testing were guided by the project creator.
 
 ## Licence
 
