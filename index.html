@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unlikely Historical Bestseller Generator — Illustrated Edition</title>
+<style>
+:root {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #242424;
+    background: #f6f5f2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 7px 12px 20px;
+}
+
+.app {
+    max-width: 650px;
+    margin: auto;
+    background: white;
+    border: 1px solid #dedbd5;
+    border-radius: 16px;
+    padding: 15px 18px 18px;
+    box-shadow: 0 6px 24px #0000000a;
+}
+
+.cover {
+    background: #f5f3ee;
+    text-align: center;
+    border-radius: 12px;
+    padding: 18px 18px 13px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: #666;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.cover h1 {
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(25px, 5vw, 36px);
+    margin: 13px 0 5px;
+    line-height: 1.25;
+}
+
+.subtitle {
+    color: #777;
+    width: 100%;
+    max-width: 490px;
+    height: 42px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.subtitle-text {
+    display: block;
+    width: 100%;
+    font-size: 13px;
+    line-height: 20px;
+    text-wrap: balance;
+    overflow-wrap: normal;
+}
+
+
+.book-author {font-family: Georgia, serif; font-size: 13px; color: #6c625c; min-height: 19px; margin-bottom: 3px;}
+.review {margin: 3px auto 0; max-width: 470px; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;}
+.review-quote {font: italic 12px/17px Georgia, serif; color: #56504c; text-wrap: balance;}
+.review-source {font-size: 10.5px; line-height: 15px; color: #77716c;}
+/* Brief paper-confetti burst for newly generated prize winners. */
+.confetti-layer {position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:8;}
+.confetti-piece {position:absolute;top:8%;left:50%;width:6px;height:10px;opacity:0;
+  background:var(--confetti-colour);border-radius:1px;
+  animation:paper-fall 1750ms cubic-bezier(.18,.65,.45,1) forwards;
+  animation-delay:var(--delay);}
+@keyframes paper-fall {
+  0% {opacity:0;transform:translate(0,0) rotate(0deg) scale(.8);}
+  10% {opacity:.9;}
+  75% {opacity:.85;}
+  100% {opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--spin));}
+}
+@media(prefers-reduced-motion:reduce) {.confetti-piece {animation:none;display:none;}}
+/* A single, generously extended diagonal band. Its ends remain outside the
+   clipped cover even when the award name wraps to a second line. */
+.cover {overflow:hidden;}
+.award-corner {
+    position:absolute; z-index:5;
+    top:48px; right:-85px; width:300px;
+    transform:rotate(45deg); transform-origin:center;
+    text-align:center; pointer-events:none;
+    background:#a89576; color:#fff;
+    padding:5px 48px 6px; box-sizing:border-box;
+    box-shadow:0 2px 6px #0f172a30;
+}
+.award-corner[hidden] {display:none;}
+.award-ribbon {
+    font-size:10px; line-height:13px; font-weight:700;
+    letter-spacing:.055em;
+}
+.award-label {
+    margin-top:2px; font-size:8px; line-height:10px;
+    font-weight:500; color:#fff9ef;
+    overflow-wrap:normal;
+    text-wrap:balance;
+}
+.award-symbol {margin-right:3px; font-size:9px;}
+.award-corner.winner {background:#9c8050;}
+@media(max-width:480px) {
+    .award-corner {top:43px;right:-91px;width:292px;padding:4px 45px 5px;}
+    .award-ribbon {font-size:9px;line-height:12px;}
+    .award-label {font-size:7.5px;line-height:9px;}
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #c9c9c9;
+    border-radius: 8px;
+    background: white;
+    color: #222;
+    font-size: 14px;
+}
+
+.settings {
+    margin: 22px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 400;
+    margin: 0;
+}
+
+.check input {
+    width: 17px;
+    height: 17px;
+    accent-color: #242424;
+}
+
+.lookback {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+}
+
+.lookback select {
+    width: auto;
+}
+
+.actions {
+    display: flex;
+    gap: 9px;
+}
+
+.actions button {
+    border: 1px solid #222;
+    border-radius: 9px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.primary {
+    flex: 1;
+    background: #242424;
+    color: white;
+}
+
+.secondary {
+    background: white;
+    color: #242424;
+}
+
+button:hover {
+    opacity: .84;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: 3px solid #789cc9;
+    outline-offset: 2px;
+}
+
+.history {
+    margin-top: 10px;
+    border-top: 0;
+    padding-top: 0;
+}
+
+.history-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history h2 {
+    font-size: 14px;
+    margin: 0;
+}
+
+.clear {
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #555;
+}
+
+.history-scroll {
+    max-height: 175px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin-top: 12px;
+    border-radius: 6px;
+}
+
+.history ol {
+    list-style: none;
+    padding: 0 8px 0 0;
+    margin: 0;
+}
+
+.history li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-family: Georgia, serif;
+    font-style: italic;
+    margin: 0;
+    padding: 8px 0;
+    min-height: 35px;
+}
+
+.history-number {
+    min-width: 2.5em;
+    color: #777;
+    font: normal 12px system-ui, sans-serif;
+    text-align: right;
+}
+
+.history-title {
+    flex: 1;
+}
+
+.status {
+    font-size: 12px;
+    color: #555;
+    min-height: 0;
+    margin-top: 0;
+    text-align: right;
+}
+
+@media (max-width: 420px) {
+    .fields {
+        grid-template-columns: 1fr;
+    }
+
+    .app {
+        padding: 16px;
+    }
+
+    .settings {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+.advanced-options {margin:10px 0 0;border:1px solid #e4e1db;border-radius:9px;background:#fbfaf8;}
+.advanced-options summary {cursor:pointer;list-style:none;padding:9px 12px;color:#635f59;font-size:12px;font-weight:600;display:flex;justify-content:space-between;}
+.advanced-options summary::-webkit-details-marker {display:none;}
+.advanced-options[open] summary span {transform:rotate(180deg);}
+.advanced-content {padding:12px;border-top:1px solid #e4e1db;}
+.advanced-content .settings {margin:13px 0 0;}
+/* Pencil-and-wash book spines with visible shading and soft, offset shadows. */
+.shelf-section {
+    margin: -3px 0 9px;
+}
+
+.shelf-scroll {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: var(--shelf-height, 300px);
+    min-height: var(--shelf-height, 300px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 9px 5px;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+.shelf-scroll::after {
+    content: "";
+    flex: 0 0 1px;
+}
+
+.book-spine {
+    display: block;
+    flex: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    line-height: 0;
+    transform-origin: bottom center;
+}
+
+.book-spine svg {
+    display: block;
+    overflow: visible;
+}
+
+.book-spine:hover,
+.book-spine:focus-visible {
+    transform: translateY(-5px);
+}
+
+.book-spine:focus-visible {
+    outline: 2px solid #597d9b;
+    outline-offset: 3px;
+}
+
+.shelf-base {
+    height: 3px;
+    margin: -3px 2px 0;
+    background: #c8b4a0;
+    border-radius: 50%;
+    opacity: .55;
+}
+
+.shelf-note {
+    font-size: 11px;
+    color: #777;
+    text-align: right;
+    margin-top: 5px;
+}
+
+</style>
+</head>
+<body>
+<main class="app">
+  <section class="cover" aria-live="polite">
+    <div class="eyebrow">The next unlikely historical bestseller</div>
+    <h1 id="title">The Taxidermist of Timbuktu</h1>
+    <div class="book-author" id="book-author">&nbsp;</div>
+    <div class="subtitle" id="tagline"><span class="subtitle-text" id="tagline-text">An extraordinary tale of ordinary people in extraordinary times.</span></div>
+    <div class="review"><div class="review-quote" id="review-quote"></div><div class="review-source" id="review-source"></div></div>
+    <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+    <div class="award-corner" id="award-corner" hidden>
+      <div class="award-ribbon" id="award-ribbon"></div>
+      <div class="award-label" id="award-label"><span class="award-symbol" aria-hidden="true">★</span><span id="award-text"></span></div>
+    </div>
+  </section>
+  <section class="shelf-section" id="shelf-section" hidden aria-label="Illustrated bookshelf of generated titles">
+    <div class="shelf-scroll" id="shelf-scroll" tabindex="0" aria-label="Scroll through generated book spines"></div>
+    <div class="shelf-base"></div>
+    <div class="shelf-note">Select a spine to revisit its book</div>
+  </section>
+  <div class="actions"><button class="primary" id="generate">Generate title</button><button class="secondary" id="copy">Copy</button></div>
+  <details class="advanced-options" id="advanced-options">
+    <summary>Settings <span aria-hidden="true">⌄</span></summary>
+    <div class="advanced-content">
+      <div class="fields">
+        <div><label for="job">Occupation</label><select id="job"></select></div>
+        <div><label for="place">Place</label><select id="place"></select></div>
+      </div>
+      <div class="settings">
+        <label class="check"><input type="checkbox" id="avoid" checked> Avoid alliteration</label>
+        <div class="lookback"><label for="lookback" style="margin:0">Exclude previous</label><select id="lookback"><option value="3">3 generations</option><option value="5" selected>5 generations</option></select></div>
+      </div>
+    </div>
+  </details>
+  <div id="status" class="status" role="status"></div>
+  <section class="history" id="history-section" hidden>
+    <div class="history-head"><h2>Previous generations</h2><button class="clear" id="clear">Clear history</button></div>
+    <div class="history-scroll" tabindex="0" aria-label="Generated title history, newest first">
+      <ol id="history"></ol>
+    </div>
+  </section>
+</main>
+<script>
+'use strict';
+const jobs = ["Taxidermist", "Embalmer", "Clockmaker", "Cartographer", "Cryptographer", "Bookbinder", "Glassblower", "Falconer", "Stonemason", "Puppeteer", "Silversmith", "Watchmaker", "Cooper", "Potter", "Weaver", "Calligrapher", "Luthier", "Engraver", "Milliner", "Tanner", "Chandler", "Typesetter", "Apothecary", "Gilder", "Dyer", "Locksmith", "Florist", "Barber", "Undertaker", "Cobbler", "Projectionist", "Groundskeeper", "Fishmonger", "Gravedigger", "Lamplighter", "Laundress", "Postman", "Caretaker", "Conductor", "Porter", "Concierge", "Chimneysweep", "Ratcatcher", "Bellringer", "Perfumer", "Entomologist", "Anatomist", "Mycologist", "Astronomer", "Genealogist", "Linguist", "Seismologist", "Ornithologist", "Curator", "Archaeologist", "Scribe", "Alchemist", "Haberdasher", "Fletcher", "Farrier", "Hatter", "Baker", "Brewer", "Tinsmith", "Tinker", "Miller", "Draper", "Gondolier", "Juggler", "Magician", "Acrobat", "Illusionist", "Sommelier", "Butcher", "Candlemaker", "Mender", "Mason", "Saddler", "Ropemaker", "Purveyor", "Scrivener", "Lapidary", "Numismatist", "Vintner", "Mercer", "Cordwainer", "Ostler", "Wainwright", "Wheelwright", "Pewterer", "Furrier", "Thatcher", "Dowser", "Diviner", "Illuminer", "Hagiographer", "Sinologist", "Philatelist", "Apiarist", "Antiquarian", "Steeplejack", "Hawker", "Sexton", "Mudlark", "Governess", "Corsetier", "Herbalist", "Tobacconist", "Sailmaker", "Chocolatier", "Vexillologist", "Ferryman", "Shipwright", "Quilter", "Upholsterer", "Physician", "Archivist", "Captain", "Architect", "Innkeeper", "Constable", "Emissary", "Notary", "Custodian", "Chancellor", "Surgeon", "Admiral", "Diplomat", "Magistrate", "Poet"];
+const places = ["Alexandria", "Aswan", "Cairo", "Carthage", "Dakar", "Fez", "Johannesburg", "Lagos", "Luxor", "Maputo", "Marrakech", "Mombasa", "Ouidah", "Tangier", "Timbuktu", "Zanzibar", "Antioch", "Ayutthaya", "Babylon", "Bukhara", "Ephesus", "Hanoi", "Isfahan", "Istanbul", "Jaipur", "Jerusalem", "Kathmandu", "Kyoto", "Lhasa", "Mumbai", "Nara", "Petra", "Samarkand", "Tbilisi", "Troy", "Varanasi", "Yerevan", "Yogyakarta", "Antwerp", "Assisi", "Athens", "Avignon", "Bergen", "Bologna", "Bordeaux", "Bruges", "Budapest", "Carcassonne", "Constantinople", "Corinth", "Córdoba", "Delft", "Delphi", "Dubrovnik", "Florence", "Gdańsk", "Ghent", "Granada", "Heidelberg", "Kilkenny", "Kraków", "Lisbon", "Ljubljana", "Marseille", "Naples", "Palermo", "Petrograd", "Pompeii", "Prague", "Ravenna", "Riga", "Salamanca", "Salzburg", "Sarajevo", "Seville", "Sparta", "Syracuse", "Tallinn", "Thessaloniki", "Trieste", "Utrecht", "Venice", "Versailles", "Vienna", "Vilnius", "Warsaw", "Waterloo", "Cartagena", "Cusco", "Havana", "Quito", "Salvador", "Tenochtitlan", "Valparaíso", "Apia", "Fremantle", "Lautoka", "Oamaru", "Tahiti", "Savannah", "Salem", "Santa Fe", "New Orleans", "Nantucket", "Kumasi", "Elmina", "Meknes", "Essaouira", "Ibadan", "Melaka", "Bhaktapur", "Udaipur", "Arequipa", "Potosí", "Karakorum", "Rye", "Whitby", "Lübeck", "Lindisfarne", "Cádiz", "Siena", "Valletta", "Lahore", "Mandalay", "Rarotonga", "Puebla", "Oaxaca", "Tétouan", "Djenné", "Évora"];
+const $ = id => document.getElementById(id);
+let history = []; // Full history for this page session; reloading resets it.
+let selectedBook = null;
+// Hand-picked, faded library palette: pastels alongside old-paper and leather tones.
+const washes = [
+  '#E8D6D3', '#E5D3D5', '#E6D4CB', '#EDDFD1', '#EBDCCB',
+  '#F0E8D2', '#F0E9CF', '#E8E2CC', '#E5DFD1', '#DDD4C4',
+  '#DCCEBE', '#D5C4B6', '#D1C5B9', '#D9E0D4', '#DEE0CE',
+  '#D2DFDA', '#D2E0E1', '#D4DFE8', '#D4DCE6', '#DDD9E9',
+  '#E5DBE8', '#E2D7DF'
+];
+// Neighbouring palette entries are broadly related; avoid nearby indices.
+// Blend a palette shade towards a highlight or shadow without introducing grey overlays.
+function blendHex(hex, target, amount) {
+  const channel = (value, offset) => parseInt(value.slice(offset, offset + 2), 16);
+  const mixed = [1, 3, 5].map(i => Math.round(channel(hex, i) * (1 - amount) + channel(target, i) * amount));
+  return '#' + mixed.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+const spineFont = 'Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif';
+const spineFontSize = 13.5;
+const canvas = document.createElement('canvas');
+const measureContext = canvas.getContext('2d');
+function titleText(job, place) { return `The ${job} of ${place}`; }
+function textLength(title) {
+  measureContext.font = `${spineFontSize}px ${spineFont}`;
+  return measureContext.measureText(title).width;
+}
+// Calculate the longest possible title before any books are added.
+const longestTitle = titleText(
+  jobs.reduce((a, b) => textLength(a) > textLength(b) ? a : b),
+  places.reduce((a, b) => textLength(a) > textLength(b) ? a : b)
+);
+const maximumSpineHeight = Math.ceil(textLength(longestTitle) + 40 + 24);
+$('shelf-scroll').style.setProperty('--shelf-height', `${maximumSpineHeight + 16}px`);
+let bookSerial = 0;
+function chooseColour() {
+  const previous = history.slice(0, 3).map(item => item.appearance.colourIndex);
+  const last = previous[0];
+  const candidates = washes.map((_, index) => index).filter(index =>
+    !previous.some(other => Math.min(Math.abs(index - other), washes.length - Math.abs(index - other)) < 3)
+  );
+  return randomItem(candidates.length ? candidates : washes.map((_, index) => index));
+}
+function populate(id, items, initial) {
+  const select = $(id);
+  for (const value of items) {
+    const option = document.createElement('option'); option.value = value; option.textContent = value; select.append(option);
+  }
+  select.value = initial;
+}
+function currentTitle() { return `The ${$('job').value} of ${$('place').value}`; }
+function updateTitle() { $('title').textContent = currentTitle(); $('status').textContent = ''; }
+function randomItem(items) { return items[Math.floor(Math.random() * items.length)]; }
+function shuffled(items) {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+function newAppearance() {
+  return {
+    width: 39 + Math.floor(Math.random() * 21),
+    height: maximumSpineHeight - Math.floor(Math.random() * 24),
+    colourIndex: chooseColour(),
+    tilt: (Math.random() - .5) * 1.5,
+    seed: Math.random() * 3 - 1.5,
+    shadeHeight: 0.10 + Math.random() * 0.18,
+    curveDepth: 0.10 + Math.random() * 0.05,
+    shadeOpacity: 0.78 + Math.random() * 0.22,
+    colourOpacity: 0.76 + Math.random() * 0.10,
+    washVariant: Math.random(),
+    tintWidth: 0.17 + Math.random() * 0.16,
+    id: ++bookSerial
+  };
+}
+function renderShelf() {
+  const shelf = $('shelf-scroll');
+  shelf.replaceChildren();
+  $('shelf-section').hidden = history.length === 0;
+  const ns = 'http://www.w3.org/2000/svg';
+  const el = (tag, attributes = {}) => {
+    const node = document.createElementNS(ns, tag);
+    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+    return node;
+  };
+  // Chronological left-to-right: newest volume appears at the right edge.
+  for (const entry of [...history].reverse()) {
+    const a = entry.appearance || (entry.appearance = newAppearance());
+    const title = titleText(entry.job, entry.place);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'book-spine';
+    button.setAttribute('aria-label', `Show ${title}`);
+    button.title = title;
+    button.style.transform = `rotate(${a.tilt}deg)`;
+    const w = a.width, h = a.height, k = a.seed;
+    const svg = el('svg', {width: w, height: h, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true'});
+    const defs = el('defs');
+    const hatchId = `hatch-${a.id}`, clipId = `clip-${a.id}`, fadeId = `fade-${a.id}`;
+    const pencilId = `pencil-${a.id}`, blurId = `soft-${a.id}`, bodyClipId = `body-${a.id}`;
+    const hatch = el('pattern', {id: hatchId, width: 2.6, height: 2.6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(35)'});
+    hatch.append(el('path', {d: 'M 0 0 V 2.6', stroke: '#28332f', 'stroke-width': 0.6, 'stroke-opacity': 0.52}));
+    const top = h * (1 - a.shadeHeight);
+    const dip = w * a.curveDepth;
+    const clip = el('clipPath', {id: clipId});
+    // Only the hatch marks are clipped; no visible curve is drawn.
+    clip.append(el('path', {d: `M 2 ${top} Q ${w / 2} ${top + 2 * dip} ${w - 2} ${top} L ${w - 2} ${h - 3} L 2 ${h - 3} Z`}));
+    const fade = el('linearGradient', {id: fadeId, gradientUnits: 'userSpaceOnUse', x1: 0, y1: top, x2: 0, y2: h});
+    fade.append(
+      el('stop', {offset: '0%', 'stop-color': 'white', 'stop-opacity': 0.30}),
+      el('stop', {offset: '100%', 'stop-color': 'white', 'stop-opacity': a.shadeOpacity})
+    );
+    const maskId = `mask-${a.id}`;
+    const mask = el('mask', {id: maskId, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: w, height: h});
+    mask.append(el('rect', {x: 0, y: 0, width: w, height: h, fill: `url(#${fadeId})`}));
+    const pencilGradient = el('linearGradient', {id: pencilId, x1: '0%', y1: '0%', x2: '100%', y2: '100%'});
+    pencilGradient.append(
+      el('stop', {offset: '0%', 'stop-color': '#47413d', 'stop-opacity': .18}),
+      el('stop', {offset: '35%', 'stop-color': '#47413d', 'stop-opacity': .55}),
+      el('stop', {offset: '70%', 'stop-color': '#47413d', 'stop-opacity': .25}),
+      el('stop', {offset: '100%', 'stop-color': '#47413d', 'stop-opacity': .48})
+    );
+    const soft = el('filter', {id: blurId, x: '-10%', y: '-10%', width: '120%', height: '120%'});
+    soft.append(el('feGaussianBlur', {stdDeviation: .42}));
+    const bodyClip = el('clipPath', {id: bodyClipId});
+    const outline = `M 2 ${3 + k} Q ${w / 2} ${1 - k} ${w - 2} ${3 - k} L ${w - 2 + k} ${h - 3} Q ${w / 2} ${h - 1 + k} 2 ${h - 3} Z`;
+    bodyClip.append(el('path', {d: outline}));
+    defs.append(hatch, clip, fade, mask, pencilGradient, soft, bodyClip);
+    const shadow = el('path', {d: outline, fill: '#36413c', 'fill-opacity': 0.29, transform: 'translate(3.6 2.5)'});
+    // An ivory undercoat and semi-transparent pigment keep the palette washed out.
+    const paper = el('path', {d: outline, fill: '#F8F4EB'});
+    const spine = el('path', {d: outline, fill: washes[a.colourIndex], 'fill-opacity': a.colourOpacity});
+    const washGroup = el('g', {'clip-path': `url(#${bodyClipId})`});
+    // A softly squared, rounded-oblong highlight and an independently curved
+    // lower pigment pool. Their slight asymmetry keeps the drawing organic.
+    const shift = (a.washVariant - .5) * 9;
+    const baseColour = washes[a.colourIndex];
+    const lightPigment = blendHex(baseColour, '#FFF9ED', .65);
+    const darkPigment = blendHex(baseColour, '#776957', .18);
+    const left = w * (.10 + a.washVariant * .035) + shift * .20;
+    const right = w * (.88 - a.washVariant * .035) + shift * .12;
+    const upper = h * (.065 + a.washVariant * .012);
+    const lower = h * (.36 + a.washVariant * .045);
+    const rx = w * (.19 + a.washVariant * .035);
+    // Rounded corners, gently straighter sides, and a slightly wandering edge.
+    const wash = el('path', {
+      d: `M ${left + rx} ${upper} Q ${w * .48} ${upper - h * .018} ${right - rx} ${upper + h * .005} ` +
+         `Q ${right + w * .025} ${upper + h * .008} ${right} ${upper + rx * .65} ` +
+         `L ${right - w * .018} ${lower - rx * .62} ` +
+         `Q ${right} ${lower + h * .015} ${right - rx} ${lower} ` +
+         `Q ${w * .47} ${lower + h * .012} ${left + rx} ${lower - h * .004} ` +
+         `Q ${left - w * .025} ${lower - h * .012} ${left} ${lower - rx * .65} ` +
+         `L ${left + w * .008} ${upper + rx * .75} ` +
+         `Q ${left - w * .01} ${upper + h * .01} ${left + rx} ${upper} Z`,
+      fill: lightPigment, 'fill-opacity': .48
+    });
+    // A gentle U-shaped low-light: its upper boundary varies well above the
+    // hatching, with independently wandering endpoints and curvature.
+    const poolLeftY = top - h * (.10 + a.washVariant * .16);
+    const poolRightY = poolLeftY + (a.washVariant - .5) * h * .05;
+    const poolDip = w * (.12 + a.washVariant * .10);
+    const poolMidX = w * (.44 + a.washVariant * .12);
+    const washTwo = el('path', {
+      d: `M -5 ${poolLeftY} Q ${poolMidX} ${poolLeftY + poolDip * 2} ${w + 5} ${poolRightY} ` +
+         `L ${w + 5} ${h + 4} L -5 ${h + 4} Z`,
+      fill: darkPigment, 'fill-opacity': .12 + a.washVariant * .045
+    });
+    const tintEdge = w * a.tintWidth;
+    const sideTint = el('path', {d: `M 3 6 Q ${tintEdge * .6} 5 ${tintEdge} 8 L ${tintEdge} ${h - 5} L 3 ${h - 4} Z`, fill: '#47545b', 'fill-opacity': 0.14});
+    const hatching = el('rect', {x: 2, y: top, width: w - 4, height: h - top, fill: `url(#${hatchId})`, 'clip-path': `url(#${clipId})`, mask: `url(#${maskId})`});
+    washGroup.append(wash, washTwo, sideTint, hatching);
+    // Crisp graphite line plus a lightly blurred, offset second pencil pass.
+    const primaryOutline = el('path', {d: outline, fill: 'none', stroke: '#595550', 'stroke-opacity': .76, 'stroke-width': 1.08, 'stroke-linejoin': 'round'});
+    const secondPath = `M 3 ${2 + k} Q ${w / 2} ${2 - k} ${w - 1} ${4 - k} L ${w - 1 + k} ${h - 2} Q ${w / 2} ${h + k} 1 ${h - 2} Z`;
+    const secondBlur = el('path', {d: secondPath, fill: 'none', stroke: `url(#${pencilId})`, 'stroke-width': 1.35, filter: `url(#${blurId})`});
+    const secondCrisp = el('path', {d: secondPath, fill: 'none', stroke: `url(#${pencilId})`, 'stroke-width': .65});
+    const lettering = el('text', {
+      x: w / 2, y: h / 2, transform: `rotate(90 ${w / 2} ${h / 2})`,
+      'text-anchor': 'middle', 'dominant-baseline': 'middle',
+      'font-family': spineFont, 'font-size': spineFontSize, fill: '#28302e'
+    });
+    lettering.textContent = title;
+    // A hairline highlight beneath the ink gives the impression of pressed type.
+    const insetHighlight = lettering.cloneNode(true);
+    insetHighlight.setAttribute('fill', '#fff');
+    insetHighlight.setAttribute('fill-opacity', '0.72');
+    insetHighlight.setAttribute('transform', `translate(0.9 0.9) rotate(90 ${w / 2} ${h / 2})`);
+    svg.append(defs, shadow, paper, spine, washGroup, secondBlur, primaryOutline, secondCrisp, insetHighlight, lettering);
+    button.append(svg);
+    button.addEventListener('click', () => {
+      $('job').value = entry.job;
+      $('place').value = entry.place;
+      showBook(entry);
+    });
+    shelf.append(button);
+  }
+  shelf.scrollLeft = shelf.scrollWidth;
+}
+function renderHistory() {
+  const list = $('history'); list.replaceChildren();
+  $('history-section').hidden = history.length === 0;
+  for (let index = 0; index < history.length; index++) {
+    const entry = history[index];
+    const li = document.createElement('li');
+    const number = document.createElement('span');
+    const title = document.createElement('span');
+    number.className = 'history-number';
+    title.className = 'history-title';
+    number.textContent = `#${history.length - index}`;
+    title.textContent = `The ${entry.job} of ${entry.place}`;
+    li.append(number, title);
+    list.append(li);
+  }
+  document.querySelector('.history-scroll').scrollTop = 0;
+  renderShelf();
+}
+// Local, Tracery-inspired grammar: nested expansions and recent-choice avoidance.
+const taglineFamilies = [
+  ['Grand declaration', [
+    'A {quality} {form} of {themes} {setting}.',
+    'An {impact} {form} of {themes}, {continuation}.',
+    '{openingQuality} {form} about {themes} and {abstractPromise}.',
+    'A {quality} {form} exploring {themes} {setting}.',
+    'An {impact} celebration of {humanTheme} {setting}.',
+    'A {quality} portrait of {humanTheme} and {abstractPromise}.'
+  ]],
+  ['Historical backdrop', [
+    '{periodOpening}, {subject} {consequence}.',
+    '{backdropOpening}, {subject} {consequence}.',
+    'As {worldChange}, {subject} {consequence}.',
+    '{subjectCap} {consequence} {setting}.',
+    '{periodOpening}, a {quality} {form} of {themes} unfolds.',
+    'Against {historicalForce}, {subject} {consequence}.'
+  ]],
+  ['Philosophical nonsense', [
+    'Sometimes {philosophySubject} {philosophyEnd}.',
+    'For every {abstractNoun}, there is {counterpart}.',
+    'The {quality} {abstractNoun} of yesterday {philosophyVerb} tomorrow.',
+    'What remains when {worldChange}? {philosophyAnswer}.',
+    'Not all {pluralNoun} are {philosophyQuality}; some are {counterpart}.',
+    'Between {abstractNoun} and {abstractNoun2} lies {counterpart}.'
+  ]],
+  ['Dramatic contrast', [
+    'In {period}, even {smallThing} {consequence}.',
+    'When {worldChange}, {smallThing} {consequence}.',
+    'The {smallQuality} {smallThingNoun} can cast the {bigQuality} shadows.',
+    'Where {abstractNoun} meets {abstractNoun2}, {subject} {consequence}.',
+    '{shortContrast}. {dramaticFragment}. {finalFragment}.',
+    'Some {pluralNoun} fade. Others {consequencePlural}.'
+  ]],
+  ['Flowery endorsement', [
+    'A {quality}, {quality2} {form} of {themes}.',
+    'A {praise} and {praise2} tribute to {humanTheme}.',
+    'An {impact} {form} that {endorsementEnd}.',
+    'A {quality} exploration of {abstractPromise} and {humanTheme}.',
+    'A {praise} evocation of {themes} {setting}.',
+    'An {impact} testament to {humanTheme} and {abstractPromise}.'
+  ]],
+  ['Verbose synopsis', [
+    '{scopeOpening}, this {quality} {form} explores {themes} and {abstractPromise}.',
+    'From {abstractNoun} to {abstractNoun2}, a {quality} {form} of {humanTheme} unfolds.',
+    '{backdropOpening}, an {impact} {form} reveals {abstractPromise}.',
+    'Through {scope}, a {quality} meditation on {themes} emerges.',
+    '{periodOpening}, a {praise} {form} charts {humanTheme}.',
+    'In a {quality} tapestry of {themes}, {subject} {consequence}.'
+  ]]
+];
+const taglineRules = {
+  quality:['sweeping','richly imagined','deeply moving','evocative','timeless','spellbinding','tender','poignant','heartfelt','compelling','luminous','beautifully observed','lyrical','quietly powerful','unforgettable','stirring'],
+  quality2:['profoundly moving','beautifully rendered','quietly compelling','richly textured','emotionally resonant','unashamedly romantic','remarkably affecting','gently haunting','endlessly absorbing','wonderfully atmospheric'],
+  form:['tale','story','narrative','chronicle','portrait','meditation','account','journey','exploration','saga'],
+  themes:['love and loss','hope and heartbreak','courage and sacrifice','longing and belonging','secrets and second chances','memory and desire','loyalty and betrayal','duty and devotion','faith and uncertainty','heartache and hope','ambition and regret','the ties that bind us','the choices that define us','the fragile nature of belonging'],
+  setting:['against the shifting tides of history','in an age of uncertainty','amid the echoes of a changing world','across the passage of generations','beneath the weight of history','at the threshold of a new era','in the shadow of momentous events','against a backdrop of profound change','through the turning of the years','in a world poised between past and future'],
+  impact:['unforgettable','extraordinary','exquisite','immersive','astonishing','evocative','enthralling','affecting','illuminating','inspiring'],
+  continuation:['where nothing is quite as it seems','in which everything is about to change','that speaks to the heart of what it means to be human','where the past is never truly past','that lingers long after the final page','in a world that will never be the same'],
+  openingQuality:['A remarkable','A beautifully realised','A profoundly affecting','A quietly compelling','A richly evocative','A deeply human'],
+  abstractPromise:['the enduring power of hope','the extraordinary nature of ordinary lives','the mysteries of the human heart','the resilience of the human spirit','the inexorable passage of time','the quiet courage of everyday existence','the possibility of transformation','the fragile bonds of memory','the meaning of belonging','the promise of a different tomorrow'],
+  humanTheme:['the indomitable human spirit','the resilience of ordinary people','the courage of the human heart','the unbreakable bonds of affection','the enduring strength of community','the complexity of human connection','the quiet dignity of everyday life','the extraordinary power of perseverance'],
+  periodOpening:['In an age of {magnitude} {turmoil}','During a time of {magnitude} {turmoil}','Throughout an era of {magnitude} {turmoil}','In a period of {magnitude} {turmoil}','Amid years of {magnitude} {turmoil}','At a moment of {magnitude} {turmoil}'],
+  magnitude:['great','profound','sweeping','immense','unprecedented','remarkable','far-reaching','extraordinary','vast','momentous'],
+  turmoil:['upheaval','change','uncertainty','transformation','unrest','turmoil','transition','possibility','disruption','awakening'],
+  subject:['ordinary lives','the smallest moments','unexpected encounters','quiet acts of courage','the simplest choices','forgotten promises','unlikely connections','the ties between us','the most personal decisions','unspoken hopes'],
+  subjectCap:['Ordinary lives','The smallest moments','Unexpected encounters','Quiet acts of courage','The simplest choices','Forgotten promises','Unlikely connections','The ties between us','The most personal decisions','Unspoken hopes'],
+  consequence:['can change everything','shape the course of history','leave an enduring mark','echo across generations','reveal what truly matters','take on extraordinary significance','alter the fabric of everyday life','become part of something greater','carry the weight of tomorrow','redefine the meaning of home'],
+  backdropOpening:['Against the backdrop of {historicalForce}','Beneath the shadow of {historicalForce}','Amid the shifting currents of {historicalForce}','As the world confronts {historicalForce}','Across the changing landscape of {historicalForce}'],
+  historicalForce:['a changing world','an uncertain future','the turning of history','momentous transformation','an age of possibility','unforeseen events','the passage of time','the forces of destiny','a world in transition'],
+  worldChange:['the world begins to change','the past refuses to fade','everything familiar falls away','the future becomes uncertain','history takes an unexpected turn','old certainties give way','the familiar becomes extraordinary','yesterday gives way to tomorrow'],
+  philosophySubject:['the longest journeys','the quietest truths','the deepest connections','the smallest beginnings','the greatest discoveries','the most enduring stories','the paths we never intended to take'],
+  philosophyEnd:['lead us back to ourselves','begin where we least expect','are those we never speak of','reveal what was there all along','leave the most lasting impressions','are found in the spaces between'],
+  abstractNoun:['memory','destiny','hope','belonging','loss','longing','time','history','love','change','silence','possibility','remembrance','devotion'],
+  abstractNoun2:['hope','heartbreak','uncertainty','desire','memory','change','courage','regret','tomorrow','yesterday','belonging'],
+  counterpart:['a promise yet to be fulfilled','a truth waiting to be discovered','the possibility of something more','an echo of what might have been','a future not yet imagined','a story still waiting to unfold'],
+  philosophyVerb:['shapes the possibilities of','casts its shadow upon','finds an echo in','quietly transforms','holds the promise of','leaves its mark upon'],
+  philosophyAnswer:['The things we carry with us','The echoes of what remains','The possibilities we have yet to imagine','The truths we thought we knew','The bonds that endure'],
+  pluralNoun:['journeys','stories','memories','promises','secrets','dreams','choices','histories'],
+  philosophyQuality:['remembered','spoken aloud','written down','easily forgotten','meant to last','what they first appear'],
+  smallThing:['the smallest gestures','the quietest choices','the simplest acts','the most ordinary encounters','the briefest moments','the gentlest promises'],
+  smallQuality:['smallest','quietest','simplest','most ordinary','most fleeting','least expected'],
+  smallThingNoun:['gesture','moment','decision','encounter','promise','act of kindness'],
+  bigQuality:['longest','deepest','greatest','most enduring','widest','most unexpected'],
+  shortContrast:['Ordinary people','Quiet lives','Small beginnings','Forgotten moments','Unspoken promises','Unexpected choices'],
+  dramaticFragment:['Extraordinary times','Uncertain futures','Enduring consequences','Impossible decisions','Unforeseen possibilities','Remarkable transformations'],
+  finalFragment:['Nothing will ever be the same','Everything is about to change','History is never far away','The future is yet unwritten','Some things endure forever','The past is only the beginning'],
+  consequencePlural:['change everything','shape what comes next','echo through the ages','become impossible to forget','leave their mark','alter the course of time'],
+  praise:['richly textured','profoundly moving','beautifully realised','wonderfully atmospheric','deeply affecting','exquisitely crafted','quietly powerful','genuinely heartfelt'],
+  praise2:['utterly compelling','endlessly evocative','emotionally resonant','unforgettably poignant','remarkably tender','thoughtfully observed','beautifully nuanced'],
+  endorsementEnd:['lingers in the imagination','speaks to the heart','transcends the boundaries of time','celebrates the human condition','captures the essence of an era','resonates across generations','reveals the beauty of ordinary existence'],
+  scopeOpening:['Spanning generations','Crossing the boundaries of time','Weaving together memory and possibility','Moving between past and present','Tracing the passage of the years','Across the changing tides of history'],
+  scope:['the turning of generations','the unfolding of history','the passage of time','the shifting currents of memory','the quiet transformations of everyday life','the changing seasons of human experience'],
+  period:['an age of {magnitude} {turmoil}','a time of {magnitude} {turmoil}','an era of {magnitude} {turmoil}','a period of {magnitude} {turmoil}']
+};
+const recentTaglineFamilies = [];
+const recentTaglineTemplates = [];
+const recentTaglineWords = [];
+function expandTagline(template, depth = 0) {
+  if (depth > 8) return template;
+  return template.replace(/\{([a-zA-Z0-9]+)\}/g, (token, key) => {
+    const options = taglineRules[key];
+    if (!options) return token;
+    const fresh = options.filter(option => !option.toLowerCase().split(/\W+/).some(word =>
+      word.length > 6 && recentTaglineWords.slice(-18).includes(word)));
+    const chosen = randomItem(fresh.length ? fresh : options);
+    recentTaglineWords.push(...chosen.toLowerCase().split(/\W+/).filter(word => word.length > 6));
+    if (recentTaglineWords.length > 80) recentTaglineWords.splice(0, recentTaglineWords.length - 80);
+    return expandTagline(chosen, depth + 1);
+  });
+}
+// Keep the tagline within two lines while retaining a fixed-height area.
+function fitTagline() {
+  const text = $('tagline-text');
+  text.style.fontSize = '13px';
+  for (let size = 13; size >= 9; size -= .25) {
+    text.style.fontSize = `${size}px`;
+    if (text.scrollHeight <= 41) break;
+  }
+}
+window.addEventListener('resize', fitTagline);
+function generateTagline() {
+  const families = taglineFamilies.map((_, index) => index).filter(index => !recentTaglineFamilies.includes(index));
+  const familyIndex = randomItem(families.length ? families : taglineFamilies.map((_, index) => index));
+  const templates = taglineFamilies[familyIndex][1];
+  const eligible = templates.map((_, index) => index).filter(index => !recentTaglineTemplates.includes(`${familyIndex}-${index}`));
+  const templateIndex = randomItem(eligible.length ? eligible : templates.map((_, index) => index));
+  recentTaglineFamilies.push(familyIndex);
+  if (recentTaglineFamilies.length > 3) recentTaglineFamilies.shift();
+  recentTaglineTemplates.push(`${familyIndex}-${templateIndex}`);
+  if (recentTaglineTemplates.length > 12) recentTaglineTemplates.shift();
+  return expandTagline(templates[templateIndex]).replace(/\s+/g, ' ').trim();
+}
+
+
+// Shared fictional publishing world. All metadata is stored per book on creation.
+const firstNames = ['Anne','Anna','Alice','Catherine','Charlotte','Clara','Elizabeth','Eleanor','Emily','Emma','Florence','Frances','Grace','Hannah','Helen','Jane','Julia','Laura','Louisa','Lucy','Margaret','Martha','Mary','Rebecca','Rose','Sarah','Susan','Victoria','William','Thomas','James','John','Edward','Henry','George','Arthur','Charles','Robert','Richard','David','Peter','Daniel','Michael','Samuel','Philip','Andrew','Oliver'];
+const surnames = ['Bennett','Carter','Clarke','Collins','Ellis','Fletcher','Harris','Morgan','Palmer','Turner','Ward','Wilson','Hughes','Morris','Taylor','Evans','Baker','Foster','Cooper','Walker','Parker','Russell','Hall','Mason','Webb','Wright','Harper','Reed','Brooks','Martin','Hill','Lewis','Hunt','Gray','Allen','Wood','Price','Bell','Grant','Dawson','Spencer','Fielding','Ashworth','Whitfield','Hartley','Barker','Sutton','Lawson','Hale','West','Rowe','Harrison','Atkins','Wells','Marsh'];
+const rareNames = ['Arabella','Clementine','Peregrine','Octavia','Cressida','Sebastian','Cordelia','Barnaby'];
+const rareSurnames = ['Featherstone','Wetherby','Ashcombe','Pemberton','Montague','Haverford'];
+const usedAuthors = new Set();
+const letter = () => randomItem('ABCDEFGHJKLMNPRSTW'.split(''));
+function makeAuthor(excluded = new Set()) {
+  for (let tries=0; tries<250; tries++) {
+    const r=Math.random(), surname=randomItem(r>.97?rareSurnames:surnames);
+    let name;
+    if(r<.40) name=`${letter()}. ${letter()}. ${surname}`;
+    else if(r<.65) name=`${randomItem(firstNames)} ${surname}`;
+    else if(r<.80) name=`${randomItem(firstNames)} ${letter()}. ${surname}`;
+    else if(r<.90) name=`${letter()}. ${surname}`;
+    else if(r<.97) name=`${Math.random()<.5?randomItem(firstNames):`${letter()}. ${letter()}.`} ${surname}-${randomItem(surnames)}`;
+    else name=`${randomItem(rareNames)} ${surname}`;
+    if(!excluded.has(name) && !usedAuthors.has(name)) {usedAuthors.add(name);return name;}
+  }
+  return `${letter()}. ${letter()}. ${randomItem(surnames)}-${randomItem(surnames)}`;
+}
+const publicationFamilies = [
+  [['Literary','Critical','Book','Modern','Contemporary','Independent','Quarterly'],['Review','Chronicle','Observer','Companion','Journal']],
+  [['Sunday','Morning','Evening','Illustrated','Provincial','Weekly'],['Herald','Chronicle','Gazette','Observer','Standard','Review','Post']],
+  [['English','National','Literary','Fiction','Historical'],['Book Review','Literary Review','Fiction Quarterly','Arts Journal','Review of Books']],
+  [['Discerning','Distinguished','Thoughtful','Cultured','Gentle'],['Reader','Literary Companion','Book Observer','Quarterly Review']]
+];
+const usedPublications=[];
+function publicationName() {
+  for(let i=0;i<60;i++) {
+    const family=weighted([[0,35],[1,30],[2,25],[3,10]]);
+    const [a,b]=publicationFamilies[family];
+    const name=`The ${randomItem(a)} ${randomItem(b)}`;
+    if(!usedPublications.slice(-22).includes(name)) {usedPublications.push(name);return name;}
+  }
+  return 'The Literary Observer';
+}
+function weighted(pairs) {let n=Math.random()*pairs.reduce((s,x)=>s+x[1],0);for(const [value,weight] of pairs){n-=weight;if(n<0)return value;}return pairs[pairs.length-1][0];}
+const reviewFamilies = [
+  [
+    'A {rvIntense} {rvQuality} and {rvSecond} {rvAchievement}.',
+    'Quite simply, a {rvQuality} {rvAchievement} of imagination and feeling.',
+    'A {rvQuality} and {rvSecond} work of {rvVirtue}.',
+    '{rvQualityCap}, {rvSecond}, and entirely {rvApproval}.',
+    'An {rvAchievementAdj} achievement in {rvVirtue}.',
+    'A {rvQuality} novel of {rvVirtue} and {rvVirtue2}.'
+  ],[
+    'Every page {rvAtmosVerb} with the atmosphere of another age.',
+    'A {rvQuality} evocation of a world both distant and familiar.',
+    'An {rvSecond} portrait of the {rvAtmosNoun} of another time.',
+    'History has rarely felt so {rvFeeling}.',
+    'A world of {rvAtmosNoun} and {rvVirtue}, {rvAtmosEnd}.',
+    'The past is brought to life with {rvVirtue} and {rvVirtue2}.'
+  ],[
+    'A novel that {rvLingers} long after the final page.',
+    '{rvQualityCap} and {rvSecond}, with an unmistakable emotional pull.',
+    'A story of {rvVirtue} that {rvLingers}.',
+    'A {rvQuality} reminder of the {rvVirtue} of ordinary lives.',
+    'A {rvSecond} book with the power to {rvEmotion}.',
+    'The kind of novel that {rvLingers}.'
+  ],[
+    'A {rvQuality} contribution to the {rvCanon} of historical fiction.',
+    'Historical fiction at its most {rvFeeling} and {rvSecond}.',
+    'A {rvQuality} addition to the literature of {rvVirtue}.',
+    'An {rvAchievementAdj} example of the historical novel at its finest.',
+    'A novel of considerable {rvVirtue} and lasting {rvVirtue2}.',
+    'An {rvAchievementAdj} work in a distinguished tradition.'
+  ],[
+    '{rvQualityCap}, {rvSecond}, and impossible to put down.',
+    'A {rvQuality} read from the very first page.',
+    'Utterly {rvFeeling} and endlessly {rvApproval}.',
+    'A {rvSecond} story that keeps the pages turning.',
+    'From beginning to end, a {rvQuality} delight.',
+    'An {rvAchievementAdj} reading experience, and one to savour.'
+  ]
+];
+const reviewRules={
+  rvIntense:['breathtakingly','remarkably','extraordinarily','beautifully','thoroughly','wonderfully','quietly'],
+  rvQuality:['accomplished','evocative','compelling','assured','moving','poignant','absorbing','richly textured','beautifully realised','subtle','atmospheric','impressive'],
+  rvQualityCap:['Accomplished','Evocative','Compelling','Assured','Moving','Poignant','Absorbing','Richly textured','Beautifully realised','Subtle','Atmospheric'],
+  rvSecond:['deeply affecting','emotionally resonant','endlessly rewarding','beautifully nuanced','genuinely heartfelt','quietly powerful','utterly absorbing','wonderfully observed','impossible to forget'],
+  rvAchievement:['triumph','achievement','novel','work','tour de force'],
+  rvAchievementAdj:['extraordinary','unforgettable','impressive','absorbing','evocative','illuminating'],
+  rvVirtue:['humanity','imagination','tenderness','restraint','empathy','depth','conviction','quiet courage','understanding','emotional truth'],
+  rvVirtue2:['compassion','insight','feeling','resonance','power','beauty','grace','understanding'],
+  rvApproval:['irresistible','memorable','absorbing','rewarding','convincing','enjoyable'],
+  rvAtmosVerb:['shimmers','glows','brims','resonates','hums'],
+  rvAtmosNoun:['memory','longing','possibility','uncertainty','human feeling','quiet detail'],
+  rvAtmosEnd:['beautifully realised','quietly observed','richly imagined','vividly rendered'],
+  rvFeeling:['vivid','immediate','alive','compelling','immersive','convincing'],
+  rvLingers:['stays with you','lingers in the imagination','resonates','refuses to fade','leaves its mark'],
+  rvEmotion:['move and surprise','stir the heart','stay in the memory','make the familiar extraordinary'],
+  rvCanon:['rich tapestry','enduring tradition','ever-expanding canon','distinguished landscape']
+};
+const absurdReviews=[
+  'Undoubtedly a book of considerable bookishness.',
+  'A triumph of words arranged in an exceptionally readable order.',
+  'A novel with a beginning, a middle, and a satisfying number of pages.',
+  'A book that truly understands what it means to be a novel.',
+  'Richly imagined, profoundly affecting, and undeniably a book.',
+  'Page after page confirms that this is, indeed, a novel.'
+];
+const backhandedReviews=[
+  'An ambitious novel that seldom allows brevity to get in its way.',
+  'A richly detailed work, remarkably committed to describing its subject.',
+  'An impressive achievement in which very little is left unsaid.',
+  'A novel of considerable length and even greater conviction.',
+  'An undeniably thorough contribution to an already substantial genre.',
+  'An admirably extensive exploration of its own considerable ambitions.'
+];
+const recentReviewFamilies=[],recentReviewTemplates=[],recentReviewWords=[];
+function expandReview(template) {
+  return template.replace(/\{(rv\w+)\}/g,(match,key)=>{
+    const options=reviewRules[key];if(!options)return match;
+    const fresh=options.filter(value=>!value.toLowerCase().split(/\W+/).some(w=>w.length>6&&recentReviewWords.slice(-24).includes(w)));
+    const chosen=randomItem(fresh.length?fresh:options);
+    recentReviewWords.push(...chosen.toLowerCase().split(/\W+/).filter(w=>w.length>6));
+    if(recentReviewWords.length>90)recentReviewWords.splice(0,recentReviewWords.length-90);
+    return chosen;
+  });
+}
+function makeReview() {
+  const mode=weighted([['normal',94],['absurd',3],['backhanded',3]]);
+  if(mode!=='normal')return randomItem(mode==='absurd'?absurdReviews:backhandedReviews);
+  const available=reviewFamilies.map((_,i)=>i).filter(i=>!recentReviewFamilies.includes(i));
+  const family=randomItem(available.length?available:reviewFamilies.map((_,i)=>i));
+  const templates=reviewFamilies[family];
+  const availableTemplates=templates.map((_,i)=>i).filter(i=>!recentReviewTemplates.includes(`${family}-${i}`));
+  const index=randomItem(availableTemplates.length?availableTemplates:templates.map((_,i)=>i));
+  recentReviewFamilies.push(family);if(recentReviewFamilies.length>3)recentReviewFamilies.shift();
+  recentReviewTemplates.push(`${family}-${index}`);if(recentReviewTemplates.length>12)recentReviewTemplates.shift();
+  return expandReview(templates[index]);
+}
+const credentials=['bestselling author','acclaimed novelist','award-winning author','historical fiction author','critically acclaimed writer','celebrated storyteller','prize-nominated novelist','author of several historical novels','acclaimed historical novelist','internationally bestselling novelist','distinguished literary figure','author of several published works'];
+function makeAttribution(author) {
+  if(Math.random()>=.15) return publicationName();
+  const eligible=history.filter(book=>book.author!==author && book.author.split(' ').at(-1)!==author.split(' ').at(-1));
+  if(eligible.length && Math.random()<.60) {
+    const previous=randomItem(eligible);
+    return `${previous.author}, author of The ${previous.job} of ${previous.place}`;
+  }
+  const reviewer=makeAuthor(new Set([author]));
+  return `${reviewer}, ${randomItem(credentials)}`;
+}
+// Once per session, two books are scheduled to endorse one another.
+// Both identities and titles exist before either appears on the shelf.
+let generationCount=0;
+let reciprocalPair=null;
+function planReciprocalPair() {
+  const firstAt=11+Math.floor(Math.random()*10); // 11th–20th generation
+  const secondAt=firstAt+8+Math.floor(Math.random()*5); // 8–12 books later
+  const firstJob=randomItem(jobs);
+  const firstPlace=randomItem(places.filter(p=>p[0].toLowerCase()!==firstJob[0].toLowerCase()));
+  const secondJob=randomItem(jobs.filter(j=>j!==firstJob));
+  const secondPlace=randomItem(places.filter(p=>p!==firstPlace && p[0].toLowerCase()!==secondJob[0].toLowerCase()));
+  const firstAuthor=makeAuthor();
+  const secondAuthor=makeAuthor(new Set([firstAuthor]));
+  return {
+    firstAt, secondAt,
+    first:{job:firstJob,place:firstPlace,author:firstAuthor},
+    second:{job:secondJob,place:secondPlace,author:secondAuthor}
+  };
+}
+function reciprocalAttribution(reviewer) {
+  return `${reviewer.author}, author of The ${reviewer.job} of ${reviewer.place}`;
+}
+const awardNames=[
+  'Historical Narrative Prize','Historical Fiction Book Prize','Literary Fiction Prize',
+  'English Historical Novel Award','Prize for Historical Literature','Annual Fiction Award',
+  'Society for Historical Fiction Award','Historical Novelists’ Guild Prize',
+  'Literary Society Book Awards','Prize for Excellence in Historical Storytelling',
+  'Award for Distinguished Historical Storytelling','Literary Achievement Prize',
+  'Historical Storytelling Award','Historical Letters Prize','Historical Fiction Critics’ Award'
+];
+const rareAwardNames=['Annual Prize for Fiction Set in the Past','Award for Outstanding Achievement in Historical Fiction Writing','Excellence in the Depiction of Previous Centuries Award'];
+let booksUntilAward=4+Math.floor(Math.random()*6);
+function makeAward() {
+  booksUntilAward--;
+  if(booksUntilAward>0)return null;
+  booksUntilAward=4+Math.floor(Math.random()*6);
+  const status=weighted([['Shortlisted',35],['Longlisted',25],['A contender',14],['Highly commended',13],['Runner-up',8],['Winner',5]]);
+  const name=randomItem(Math.random()<.025?rareAwardNames:awardNames);
+  const prefix=status==='A contender'?'A contender for the':status==='Highly commended'?'Highly commended for the':status==='Runner-up'?'Runner-up for the':status==='Winner'?'Winner of the':`${status} for the`;
+  return {status,name,text:`${prefix} ${name}`};
+}
+function showBook(book) {
+  selectedBook = book;
+  $('job').value=book.job;$('place').value=book.place;updateTitle();
+  $('tagline-text').textContent=book.tagline;fitTagline();
+  $('book-author').textContent=`by ${book.author}`;
+  $('review-quote').textContent=`“${book.review}”`;
+  $('review-source').textContent=`— ${book.attribution}`;
+  const corner=$('award-corner'),ribbon=$('award-ribbon');
+  corner.hidden=!book.award;
+  if(book.award){$('award-text').textContent=book.award.name; ribbon.textContent=book.award.status.toUpperCase();corner.classList.toggle('winner',book.award.status==='Winner');}
+  else corner.classList.remove('winner');
+}
+
+function winnerConfetti() {
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const layer=$('confetti-layer');
+  layer.replaceChildren();
+  const colours=['#c8ac74','#e8d8ae','#d6c4bb','#c5d5c9','#d2c9e1','#e6d6ce'];
+  for(let i=0;i<28;i++){
+    const piece=document.createElement('span');
+    piece.className='confetti-piece';
+    const fromLeft=i%2===0;
+    piece.style.left=fromLeft?'12%':'88%';
+    piece.style.top='12%';
+    piece.style.setProperty('--confetti-colour',colours[Math.floor(Math.random()*colours.length)]);
+    piece.style.setProperty('--dx',`${(fromLeft?1:-1)*(20+Math.random()*210)}px`);
+    piece.style.setProperty('--dy',`${60+Math.random()*165}px`);
+    piece.style.setProperty('--spin',`${(Math.random()-.5)*900}deg`);
+    piece.style.setProperty('--delay',`${Math.random()*190}ms`);
+    layer.append(piece);
+  }
+  window.setTimeout(()=>{if(layer.isConnected)layer.replaceChildren();},2200);
+}
+function generate() {
+  const recent = history.slice(0, Number($('lookback').value));
+  const blockedJobs = new Set(recent.map(entry => entry.job));
+  const blockedPlaces = new Set(recent.map(entry => entry.place));
+  const availableJobs = jobs.filter(job => !blockedJobs.has(job));
+  const job = randomItem(availableJobs.length ? availableJobs : jobs);
+  const eligiblePlaces = places.filter(place => !blockedPlaces.has(place) && (!$('avoid').checked || place[0].toLowerCase() !== job[0].toLowerCase()));
+  const fallbackPlaces = places.filter(place => !$('avoid').checked || place[0].toLowerCase() !== job[0].toLowerCase());
+  const place = randomItem(eligiblePlaces.length ? eligiblePlaces : fallbackPlaces.length ? fallbackPlaces : places);
+  generationCount++;
+  const firstMatch=reciprocalPair && generationCount===reciprocalPair.firstAt;
+  const secondMatch=reciprocalPair && generationCount===reciprocalPair.secondAt;
+  const planned=firstMatch?reciprocalPair.first:secondMatch?reciprocalPair.second:null;
+  const bookJob=planned?planned.job:job;
+  const bookPlace=planned?planned.place:place;
+  const author=planned?planned.author:makeAuthor();
+  const attribution=firstMatch?reciprocalAttribution(reciprocalPair.second)
+    :secondMatch?reciprocalAttribution(reciprocalPair.first):makeAttribution(author);
+  const book={job:bookJob,place:bookPlace,appearance:newAppearance(),author,tagline:generateTagline(),review:makeReview(),attribution,award:makeAward()};
+  history.unshift(book);showBook(book);renderHistory();
+  if(book.award?.status==='Winner')winnerConfetti();
+}
+async function copyTitle() {
+  const book=selectedBook;
+  if(!book)return;
+  const lines=[`The ${book.job} of ${book.place}`,`by ${book.author}`,'',book.tagline,'',`“${book.review}”`,`— ${book.attribution}`];
+  if(book.award)lines.push('',book.award.text);
+  const listing=lines.join('\n');
+  try {
+    if(navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(listing);
+    else {
+      const field=document.createElement('textarea');field.value=listing;
+      field.style.position='fixed';field.style.opacity='0';document.body.append(field);field.select();
+      const success=document.execCommand('copy');field.remove();if(!success)throw new Error('Copy unavailable');
+    }
+    $('status').textContent='Book details copied.';
+  } catch { $('status').textContent='Copy unavailable in this browser.'; }
+}
+populate('job', shuffled(jobs), 'Taxidermist'); populate('place', shuffled(places), 'Timbuktu');
+$('job').addEventListener('change', updateTitle); $('place').addEventListener('change', updateTitle);
+$('generate').addEventListener('click', generate); $('copy').addEventListener('click', copyTitle);
+$('clear').addEventListener('click', () => { history = []; usedAuthors.clear(); usedPublications.length=0; booksUntilAward=4+Math.floor(Math.random()*6); generationCount=0; reciprocalPair=planReciprocalPair(); renderHistory(); });
+// Preassign the reciprocal reviewers before the first book is generated.
+reciprocalPair=planReciprocalPair();
+// Create the first complete book on load, including its tagline and metadata.
+generate();
+</script>
+</body>
+</html>
