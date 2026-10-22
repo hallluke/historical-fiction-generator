@@ -15,7 +15,7 @@ Generate fictional book titles, complete with authors, dramatic taglines, litera
 
 ## Usage
 
-Visit the [live generator](historical-fiction-generator), or download `index.html` and open it in a modern web browser.
+Visit the [live generator](index.html), or download `index.html` and open it in a modern web browser.
 
 No installation, account, server or external dependencies are required.
 
